@@ -209,3 +209,4 @@ __marimo__/
 .idea/
 patchpilotai.2025-09-26.private-key.pem
 .web.pid
+.worker.pid
