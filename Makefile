@@ -48,3 +48,7 @@ stop-redis:
 	else \
 		echo "No running Redis container named pp-redis."; \
 	fi
+
+# --- Utility ---
+gen-key:
+	@python3 -c "import secrets, string; alphabet = string.ascii_letters + string.digits + string.punctuation; print(''.join(secrets.choice(alphabet) for _ in range(50)))"
