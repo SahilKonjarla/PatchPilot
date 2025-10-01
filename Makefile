@@ -1,4 +1,4 @@
-.PHONY: web worker redis stop-web stop-worker stop-redis
+.PHONY: web worker redis stop-web stop-worker stop-redis run stop
 
 # --- Start targets ---
 web:
@@ -34,11 +34,10 @@ stop-web:
 
 stop-worker:
 	@if [ -f .worker.pid ]; then \
-		echo "Stopping Celery worker..."; \
-		kill $$(cat .worker.pid) || true; \
-		rm -f .worker.pid; \
+		kill `cat .worker.pid` && rm .worker.pid && echo "Worker stopped via PID file."; \
 	else \
-		echo "No worker PID file found."; \
+		echo "No worker PID file found, trying pkill..."; \
+		pkill -f "celery -A project worker" || echo "No worker processes found."; \
 	fi
 
 stop-redis:
@@ -49,6 +48,14 @@ stop-redis:
 		echo "No running Redis container named pp-redis."; \
 	fi
 
-# --- Utility ---
-gen-key:
-	@python3 -c "import secrets, string; alphabet = string.ascii_letters + string.digits + string.punctuation; print(''.join(secrets.choice(alphabet) for _ in range(50)))"
+# --- Combined run/stop targets ---
+run:
+	@echo "Starting all PatchPilot services..."
+	$(MAKE) redis
+	$(MAKE) worker
+	$(MAKE) web
+	@trap '$(MAKE) stop' INT TERM; \
+	wait
+
+stop: stop-web stop-worker stop-redis
+	@echo "All services stopped."
