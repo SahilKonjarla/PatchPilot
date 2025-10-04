@@ -1,6 +1,5 @@
 
 
-```
 # 🧠 PatchPilot
 
 **PatchPilot** is an autonomous, AI-powered code review assistant that integrates directly with GitHub pull requests.
@@ -20,7 +19,6 @@ It listens to repository webhooks, fetches code changes, analyzes diffs with an 
 
 ---
 
-```
 ## 🧩 Architecture Overview
 
 ```
