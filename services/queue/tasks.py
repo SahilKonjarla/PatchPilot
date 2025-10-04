@@ -83,10 +83,19 @@ def review_pull_request(self, repo_full: str, pr_number: int, head_sha: str, ins
                     await post_pr_comment(token, repo_full, pr_number, review["summary"])
                     logger.info("[PatchPilot] Posted comment to %s", context)
                 except httpx.HTTPStatusError as gh_err:
-                    if gh_err.response.status_code in {403, 404, 429, 500, 502, 503, 504}:
-                        logger.warning("[PatchPilot] Transient GitHub failure for %s (%s). Retrying later.", context, gh_err)
+                    status = gh_err.response.status_code
+
+                    if status in {403, 404, 429, 500, 502, 503, 504}:
+                        logger.warning(
+                            "[PatchPilot] Transient GitHub failure for %s (HTTP %s). Retrying later.",
+                            context, status,
+                        )
                         raise self.retry(exc=gh_err)
-                    logger.error("[PatchPilot] Permanent GitHub failure for %s: %s", context, gh_err)
+
+                    logger.error(
+                        "[PatchPilot] Non-retryable GitHub error for %s: HTTP %s %s",
+                        context, status, gh_err.response.text,
+                    )
                     return {"failed_comment": True}
 
                 return {"ok": True}

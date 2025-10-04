@@ -26,7 +26,7 @@ tasks_total = Counter(
 task_duration_seconds = Histogram(
     "patchpilot_task_duration_seconds",
     "Duration of Celery tasks in seconds",
-    ["name"],
+    ["name", "status"],
     registry=registry,
 )
 
